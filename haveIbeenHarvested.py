@@ -148,7 +148,7 @@ if __name__ == '__main__':
 				efile = argv[i+1]
 				with open(efile,"r") as emailFile:
 					for tmpEmail in emailFile:
-						if tmpEmail.strip().lower not in " ".join(emails):
+						if tmpEmail.strip().lower() not in " ".join(emails):
 							emails.append(tmpEmail.strip().lower())
 			else:
 				print "The specified email list does not exist"
