@@ -11,6 +11,8 @@ If you are not running this in Kali:
 
 This script will run the harverster on a domain and submit results to the haveIbeenPwned API
 
+haveIbeenHarvested.py [options] [option arguments]
+
 Arguments:
 
 -d [domain.com]				This will run the harvester on a domain then run the e-mails the harvester finds through the haveibeenpwned API
