@@ -1,5 +1,5 @@
 # haveIbeenHarvested
-This should work with a default Kali install...
+This should work with a default Kali 2016.2 install.
 
 If you are not running this in Kali:
 
