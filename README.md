@@ -9,7 +9,8 @@ If you are not running this in Kali:
 
 
 
-This script will run the harverster on a domain 
+This script will run the harverster on a domain
+
 Arguments:
 
 -d [domain.com]				This will run the harvester on a domain then run the e-mails the harvester finds through the haveibeenpwned API
@@ -18,7 +19,7 @@ Arguments:
 
 -e [email@place.com]			This will return the results of haveibeenpwned API for a single e-mail
 
--ef [emailFile.txt]			[emailFile.txt] is a file of emails that are separated by a newline. 
+-ef [emailFile.txt]			Accepts a list of emails separated by newlines. 
 
 -of [outputFile]			The results will be saved to specified outputFile as an HTML document.
 					If -of is not specified the results will be saved to haveIbeenHarvested.html
