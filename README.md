@@ -26,7 +26,7 @@ Arguments:
 -of [outputFile]			The results will be saved to specified outputFile as an HTML document.
 					If -of is not specified the results will be saved to haveIbeenHarvested.html
 
-
+-h					Prints out the list of arguments and some example uses.
 
 
 At least one domain or email must be specified in order to run this script.
