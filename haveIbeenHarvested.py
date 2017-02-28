@@ -33,7 +33,7 @@ def getPwned(email):
 						if "http" in link:
 							references.append(link.split("\"")[0])
 					print "References:", ", ".join(references)
-				results[breach['Title']] = {'Domain':breach['Domain'], 'DataClass':breach['DataClasses'],'DoB':breach['BreachDate'],'DoD':breach['AddedDate'],'References':references}
+				results[breach['Title'].encode('utf8')] = {'Domain':breach['Domain'].encode('utf8'), 'DataClass':breach['DataClasses'],'DoB':breach['BreachDate'],'DoD':breach['AddedDate'],'References':references}
 			print "#"*30+"\n"
 			
 		elif r.status_code == 404:
@@ -62,7 +62,7 @@ def harvest(domain):
 	return outFile
 
 def parseHarvest(outfile):
-	outfile = outfile.replace(".com","")
+	outfile = outfile.strip(".com")
 	outfile = outfile+".xml"
 	print "parsing",outfile
 	tree = ET.parse(outfile)
@@ -76,7 +76,6 @@ def parseHarvest(outfile):
 
 def writeHTML(totes,output):
 	outfile = output
-	print "Saving results to",outfile
 	with open(outfile,'w') as of:
 		of.write("""<!DOCTYPE html>
 	<html>
@@ -108,11 +107,14 @@ def writeHTML(totes,output):
 	
 		of.write("</body></html>")
 		
+	print "Saving results to",outfile
+		
 if __name__ == '__main__':
 	domains = []	#list of domains
 	emails = []	#list of emails
 	totes = {}	#dictionary of results
 	output = "haveIbeenHarvested.html"
+	tamper = []
 	if os.path.isfile("/usr/bin/theharvester") != True and os.path.isfile("/usr/share/theharvester") != True:
 		print "\"theharvester\" must be in your either /usr/bin or /usr/share"
 		exit()
@@ -154,15 +156,28 @@ if __name__ == '__main__':
 				print "The specified email list does not exist"
 				exit()
 				
+		if "--tamper" in argv[i]:
+			tamper_domains = argv[i+1]
+			tamper_domains = tamper_domains.split(",")
+			for tdomain in tamper_domains:
+				if tdomain not in tamper:
+					tamper.append(tdomain)
+				
 		if argv[i] == "-h":
 			print """
 Arguments:
 -d [domain.com]				This will run the harvester on a domain then run the e-mails the harvester finds through the haveibeenpwned API
+
 -df [domainFile.txt]			[emailFile.txt] is a file of emails that are separated by a newline. 
+
 -e [email@place.com]			This will return the results of haveibeenpwned API for a single e-mail
+
 -ef [emailFile.txt]			[emailFile.txt] is a file of emails that are separated by a newline. 
+
 -of [outputFile]			The results will be saved to specified outputFile as an HTML document.
 					If -of is not specified the results will be saved to haveIbeenHarvested.html
+
+--tamper [domain1.com,domain2.com,..]		This will modify and add email addresses to contain
 
 
 At least one domain or email must be specified in order to run this script.
@@ -179,6 +194,9 @@ haveIbeenHarvested.py -df domains.txt -of results.html
 
 haveIbeenHarvested.py -ef emails.txt
 	This will run the emails specified in this file through the haveibeenpwned API and save the results to haveIbeenHarvested.html
+	
+haveIbeenHarvested.py -e test@place.com --tamper domain1.com,domain2.com,gmail.com
+	This will run the test@place.com, test@domain1.com, test@domain2.com, and test@gmail.com through the HaveIbeenPwned API and save the results to haveIbeenHarvested.html
 """
 	
 			exit()
@@ -199,11 +217,16 @@ haveIbeenHarvested.py -ef emails.txt
 					
 		for email in emails:
 			totes[email] = getPwned(email)
+			for tDomain in tamper:
+				tamperedEmail = email.split("@")[0]+"@"+tDomain
+				totes[tamperedEmail] = getPwned(tamperedEmail)
 			
 	else:
 		for email in emails:
 			totes[email] = getPwned(email)		
-
+			for tDomain in tamper:
+				tamperedEmail = email.split("@")[0]+"@"+tDomain
+				totes[tamperedEmail] = getPwned(tamperedEmail)
 	
 	writeHTML(totes,output)
 	
