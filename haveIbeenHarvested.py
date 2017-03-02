@@ -7,6 +7,8 @@ import xml.etree.ElementTree as ET
 import subprocess
 import os
 from sys import argv
+from xml.etree.ElementTree import Element, Comment, SubElement, tostring 	#writing xlm	
+from xml.dom import minidom								#prettyup xml
 
 def getPwned(email):
 	ran = False
@@ -73,6 +75,34 @@ def parseHarvest(outfile):
 		if email.text not in " ".join(emails):
 			emails.append(email.text)
 	return emails
+
+
+def prettify(elem):									
+	rough_string = ET.tostring(elem, 'utf-8')
+	reparsed = minidom.parseString(rough_string)
+	return reparsed.toprettyxml(indent="    ")
+
+def writeXML(totes, outfile):
+	top = Element("PwnList")
+	for email in totes.keys():
+		if "has not been pwned" not in totes[email]:
+			emailNode = SubElement(top,'email',{'address':email})
+			for title in totes[email].keys():
+				titleNode = SubElement(emailNode,"breach",{"title":title,"domain":totes[email][title]['Domain'],"DateOfBreach":totes[email][title]['DoB'],"DateOfDisclosure":totes[email][title]['DoD']})
+				infoNode = SubElement(titleNode,"info")
+				for info in totes[email][title]['DataClass']:
+					infoNode = SubElement(titleNode,"info")
+					infoNode.text = info
+				
+				referenceNode = SubElement(titleNode,"references")
+				for reference in totes[email][title]['References']:
+					referenceNode = SubElement(titleNode,"references")
+					referenceNode.text = reference
+				
+	print "Saving XML results to",outfile			
+	with open(outfile,'w') as of:
+		of.write(prettify(top))
+
 
 def writeHTML(totes,output):
 	outfile = output
@@ -229,4 +259,6 @@ haveIbeenHarvested.py -e test@place.com --tamper domain1.com,domain2.com,gmail.c
 				totes[tamperedEmail] = getPwned(tamperedEmail)
 	
 	writeHTML(totes,output)
+	output = output.replace(".html",".xml")
+	writeXML(totes,output)
 	
