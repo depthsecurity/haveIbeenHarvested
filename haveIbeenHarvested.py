@@ -64,7 +64,7 @@ def harvest(domain):
 	return outFile
 
 def parseHarvest(outfile):
-	outfile = outfile.strip(".com")
+	outfile = outfile.split('.')[0]
 	outfile = outfile+".xml"
 	print "parsing",outfile
 	tree = ET.parse(outfile)
